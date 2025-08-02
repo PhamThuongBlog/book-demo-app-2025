@@ -1,0 +1,874 @@
+{
+	"info": {
+		"_postman_id": "b3036dc7-eba1-4774-89ee-2943435a7c71",
+		"name": "AppointmentApp Test Collection",
+		"description": "Test cases for appointment management system",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44988161"
+	},
+	"item": [
+		{
+			"name": "Set up",
+			"item": [
+				{
+					"name": "Setup - Init Environment",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Tạo user ngẫu nhiên",
+									"const id1 = Math.floor(Math.random() * 100000);",
+									"const id2 = Math.floor(Math.random() * 100000);",
+									"",
+									"pm.environment.set(\"user1_username\", \"user\" + id1);",
+									"pm.environment.set(\"user1_email\", \"user\" + id1 + \"@example.com\");",
+									"pm.environment.set(\"user1_password\", \"password123\");",
+									"",
+									"pm.environment.set(\"user2_username\", \"user\" + id2);",
+									"pm.environment.set(\"user2_email\", \"user\" + id2 + \"@example.com\");",
+									"pm.environment.set(\"user2_password\", \"password123\");",
+									"",
+									"// Tạo thời gian cuộc hẹn",
+									"function formatDate(dt) {",
+									"  return dt.toISOString().slice(0, 19);",
+									"}",
+									"",
+									"const now = new Date();",
+									"const start = new Date(now.getTime() + 10 * 60000);",
+									"const end = new Date(start.getTime() + 30 * 60000);",
+									"",
+									"pm.environment.set(\"appt_start\", formatDate(start));",
+									"pm.environment.set(\"appt_end\", formatDate(end));",
+									"",
+									"// Thông tin cuộc hẹn",
+									"pm.environment.set(\"appt_title\", \"Cuộc hẹn tự động \" + Math.floor(Math.random() * 1000));",
+									"pm.environment.set(\"appt_description\", \"Mô tả cuộc hẹn demo\");",
+									"pm.environment.set(\"appt_location\", \"Phòng họp A\");",
+									"",
+									"// Thêm địa điểm ngẫu nhiên",
+									"pm.environment.set(\"location_name\", \"Phòng họp \" + Math.floor(Math.random() * 100));",
+									"",
+									"// Reset biến động",
+									"pm.environment.unset(\"jwt_token\");",
+									"pm.environment.unset(\"appointment_id\");",
+									"pm.environment.unset(\"request_id\");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Setup environment thành công\", function () {",
+									"    pm.expect(pm.environment.get(\"user1_username\")).to.be.a(\"string\");",
+									"    pm.expect(pm.environment.get(\"appt_start\")).to.match(/\\d{4}-\\d{2}-\\d{2}T/);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}",
+							"host": [
+								"{{base_url}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Authorization",
+			"item": [
+				{
+					"name": "Đăng ký",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Đăng ký thành công\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"{{user1_username}}\",\n  \"email\": \"{{user1_email}}\",\n  \"password\": \"{{user1_password}}\",\n  \"confirmPassword\": \"{{user1_password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/signup",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Đăng ký 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Đăng ký thành công\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"{{user2_username}}\",\n  \"email\": \"{{user2_email}}\",\n  \"password\": \"{{user2_password}}\",\n  \"confirmPassword\": \"{{user2_password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/signup",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Đăng nhập",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Đăng nhập thành công\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property(\"token\");",
+									"    pm.environment.set(\"jwt_token\", jsonData.token);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"{{user1_username}}\",\n  \"password\": \"{{user1_password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/signin",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"signin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Đăng nhập 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Đăng nhập thành công\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property(\"token\");",
+									"    pm.environment.set(\"jwt_token_2\", jsonData.token);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"{{user2_username}}\",\n  \"password\": \"{{user2_password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/signin",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"signin"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Appointment Manager",
+			"item": [
+				{
+					"name": "Thêm cuộc hẹn",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Thêm cuộc hẹn thành công\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property(\"id\");",
+									"    pm.environment.set(\"appointment_id\", json.id);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"{{appt_title}}\",\n  \"description\": \"{{appt_description}}\",\n  \"startTime\": \"{{appt_start}}\",\n  \"endTime\": \"{{appt_end}}\",\n  \"location\": \"{{appt_location}}\",\n  \"status\": \"SCHEDULED\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/appointments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"appointments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Hiển thị cuộc hẹn",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Danh sách cuộc hẹn trả về thành công\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    pm.expect(pm.response.json()).to.be.an(\"array\");",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/appointments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"appointments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sửa cuộc hẹn",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Cập nhật cuộc hẹn thành công\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"{{appt_title}} - cập nhật\",\n  \"description\": \"Nội dung cập nhật\",\n  \"startTime\": \"{{appt_start}}\",\n  \"endTime\": \"{{appt_end}}\",\n  \"location\": \"{{appt_location}}\",\n  \"status\": \"SCHEDULED\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/appointments/{{appointment_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"appointments",
+								"{{appointment_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Xóa cuộc hẹn",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Xóa cuộc hẹn thành công\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/appointments/{{appointment_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"appointments",
+								"{{appointment_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Gửi yêu cầu cuộc hẹn (chấp nhận)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Gửi yêu cầu thành công\", function () {",
+									"    pm.response.to.have.status(201);",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property(\"id\");",
+									"    pm.environment.set(\"request_id\", json.id);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"receiverUsername\": \"{{user2_username}}\",\n  \"title\": \"Họp chấp nhận\",\n  \"description\": \"Demo gửi yêu cầu chấp nhận\",\n  \"startTime\": \"{{appt_start}}\",\n  \"endTime\": \"{{appt_end}}\",\n  \"location\": \"Phòng B\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/appointment-requests",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"appointment-requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Phản hồi yêu cầu (chấp nhận)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Chấp nhận yêu cầu thành công\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token_2}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/appointment-requests/{{request_id}}/respond?accept=true",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"appointment-requests",
+								"{{request_id}}",
+								"respond"
+							],
+							"query": [
+								{
+									"key": "accept",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Gửi yêu cầu cuộc hẹn (từ chối)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Gửi yêu cầu từ chối thành công\", function () {",
+									"    pm.response.to.have.status(201);",
+									"    const json = pm.response.json();",
+									"    pm.expect(json).to.have.property(\"id\");",
+									"    pm.environment.set(\"request_id\", json.id);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"receiverUsername\": \"{{user2_username}}\",\n  \"title\": \"Họp từ chối\",\n  \"description\": \"Demo gửi yêu cầu từ chối\",\n  \"startTime\": \"{{appt_start}}\",\n  \"endTime\": \"{{appt_end}}\",\n  \"location\": \"Phòng C\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/appointment-requests",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"appointment-requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Phản hồi yêu cầu (từ chối)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Từ chối yêu cầu thành công\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token_2}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/appointment-requests/{{request_id}}/respond?accept=false",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"appointment-requests",
+								"{{request_id}}",
+								"respond"
+							],
+							"query": [
+								{
+									"key": "accept",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Tìm kiếm theo tiêu đề",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Tìm kiếm theo tiêu đề thành công\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    pm.expect(pm.response.json()).to.be.an(\"array\");",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/appointments/search?title=Họp",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"appointments",
+								"search"
+							],
+							"query": [
+								{
+									"key": "title",
+									"value": "Họp"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Tìm kiếm theo ngày",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Tìm kiếm theo ngày thành công\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    pm.expect(pm.response.json()).to.be.an(\"array\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/appointments/search?date={{appt_start}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"appointments",
+								"search"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "{{appt_start}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Location Manager",
+			"item": [
+				{
+					"name": "Thêm địa điểm",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Thêm địa điểm thành công\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"{{location_name}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/locations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"locations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sửa địa điểm",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Cập nhật địa điểm thành công\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"{{location_name}} - cập nhật\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/locations/{{location_name}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"locations",
+								"{{location_name}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Xóa địa điểm",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Xóa địa điểm thành công\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/locations/{{location_name}} - cập nhật",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"locations",
+								"{{location_name}} - cập nhật"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
